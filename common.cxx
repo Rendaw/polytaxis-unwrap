@@ -1,9 +1,11 @@
-Filesystem::PathT GetRoot(void)
+#include "ren-cxx-filesystem/path.h"
+
+OptionalT<Filesystem::PathT> GetRoot(void)
 {
 	if (!getenv("HOME"))
 	{
 		std::cerr << "HOME isn't set, can't create mount directory." << std::endl;
-		return 1;
+		return {};
 	}
-	return RootPath = Filesystem::PathT::Absolute(getenv("HOME") + "/.share/ptwrapd/mount");
+	return Filesystem::PathT::Absolute(std::string(getenv("HOME")) + "/.share/ptwrapd/mount");
 }
