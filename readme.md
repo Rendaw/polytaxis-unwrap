@@ -19,4 +19,4 @@ this file didn't have a polytaxis header but it's all the same to ptwrap
 
 `ptwrapd` provides a fuse filesystem that mirrors the root filesystem.  Any file opened in the `ptwrapd` mount transparently hides the polytaxis header if present.
 
-`ptwrapd` uses a mount point in your home directory (`~/.share/ptwrapd/mnt`).
+`ptwrapd` uses a mount point in your home directory (`~/.local/share/ptwrapd/mnt`).
