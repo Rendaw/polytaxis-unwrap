@@ -24,14 +24,14 @@ int main(int argc, char **argv)
 	auto const Root = GetRoot();
 	if (!Root->DirectoryExists())
 	{
-		std::cerr << *Root << " doesn't exist.  Is ptwrapd running?" << std::endl;
+		std::cerr << *Root << " doesn't exist.  Is ptunwrapd running?" << std::endl;
 		return 1;
 	}
 
 	if (argc < 2)
 	{
-		std::cerr << "ptwrap requires a command line." << std::endl;
-		std::cerr << "ptwrap replaces ^^-preceded paths with unwrapped substitutes." << std::endl;
+		std::cerr << "ptunwrap requires a command line." << std::endl;
+		std::cerr << "ptunwrap replaces ^^-preceded paths with unwrapped substitutes." << std::endl;
 		return 1;
 	}
 

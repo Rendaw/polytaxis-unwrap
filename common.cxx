@@ -7,5 +7,5 @@ OptionalT<Filesystem::PathT> GetRoot(void)
 		std::cerr << "HOME isn't set, can't create mount directory." << std::endl;
 		return {};
 	}
-	return Filesystem::PathT::Absolute(std::string(getenv("HOME")) + "/.local/share/ptwrapd/mount");
+	return Filesystem::PathT::Absolute(std::string(getenv("HOME")) + "/.local/share/ptunwrap/mount");
 }
