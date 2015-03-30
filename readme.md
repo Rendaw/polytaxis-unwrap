@@ -1,22 +1,26 @@
-# What is `ptunwrap`?
-`ptunwrap` is a tool to open files with polytaxis headers in applications that don't support polytaxis.
+# What is `polytaxis-unwrap`?
 
-`ptunwrap` consists of two parts - `ptunwrap` and `ptunwrapd`.  `ptunwrapd` must be running to use `ptunwrap`.
+`polytaxis-unwrap` is a tool to open files with polytaxis headers in applications that don't support polytaxis.
 
-### `ptunwrap`
+`polytaxis-unwrap` does this by exposing a fuse filesystem that mirrors the root filesystem.  Any file opened in the fuse filesystem transparently hides the polytaxis header if present.
 
-`ptunwrap` runs a command, substituting marked filenames with paths to pseudo-files served by `ptunwrapd`.
+This is probably most useful with a path translator like `unpt` in [polytaxis-utils](https://github.com/Rendaw/polytaxis-utils) or `polytaxis-unwrap`-aware applications like `ptq` (also in polytaxis-utils).
 
-Example (assuming `file.txt.p` is some text file with a polytaxis header):
+### Installation
+
+Installation requires fuse and tup.
+
+After cloning the repository:
 ```bash
-$ ptunwrap cat ^^ file.txt.p
-this is the file contents sans polytaxis header
-$ ptunwrap cat file2.txt
-this file didn't have a polytaxis header but it's all the same to ptunwrap
+git submodule update --init
+tup init
+cp tup.template.config tup.config
+tup upd
 ```
 
-### `ptunwrapd`
+Copy `polytaxis-unwrap` to somewhere on your path.
 
-`ptunwrapd` provides a fuse filesystem that mirrors the root filesystem.  Any file opened in the `ptunwrapd` mount transparently hides the polytaxis header if present.
+### Usage
 
-`ptunwrapd` uses a mount point in your home directory (`~/.local/share/ptunwrapd/mnt`).
+`polytaxis-unwrap` takes no command line arguments.  Start it and leave it running until you no longer need to unwrap files.
+

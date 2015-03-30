@@ -10,7 +10,7 @@
 #include "ren-cxx-fuse/fuse_outofband.h"
 #include "ren-cxx-filesystem/path.h"
 
-std::string const Mark("<<<<\n");
+std::vector<uint8_t> const Mark{'<', '<', '<', '<', '\n'};
 
 OptionalT<Filesystem::PathT> GetRoot(void)
 {
@@ -80,23 +80,25 @@ size_t GetHeaderLength(std::string const &Path)
 		}
 		if (Length < 0)
 		{
-			std::vector<uint8_t> Buffer;
-			std::string Parts[2];
+			std::vector<uint8_t> Buffer; // Assumes buffer size is >= 1/2 mark I think, will break otherwise
+			size_t LastPartSize = 0;
+			std::vector<uint8_t> Joined;
 			for (int Next = 0; Buffer.resize(0), File.Read(Buffer); Next = !Next)
 			{
-				Parts[Next] = std::string((char const *)&Buffer[0], Buffer.size());
-				auto const Joined = Parts[!Next] + Parts[Next];
-				auto const FoundAt = Joined.find_first_of(Mark);
-				if (FoundAt == std::string::npos) continue;
-				size_t const FullLength = File.Tell() - Joined.size() + Mark.size();
+				Joined.erase(Joined.begin(), Joined.end() + LastPartSize);
+				Joined.insert(Joined.end(), Buffer.begin(), Buffer.end());
+				LastPartSize = Buffer.size();
+				auto const FoundAt = std::search(Joined.begin(), Joined.end(), Mark.begin(), Mark.end());
+				if (FoundAt == Joined.end()) continue;
+				auto const FoundAtInt = FoundAt - Joined.begin();
+				size_t const FullLength = File.Tell() - Joined.size() + FoundAtInt + Mark.size();
 				return FullLength;
-
 			}
 			throw HeaderReadFail();
 		}
 		else
 		{
-			auto FullLength = 24 + Length;
+			auto FullLength = File.Tell() + Length;
 			return FullLength;
 		}
 	}
@@ -108,9 +110,9 @@ size_t GetHeaderLength(std::string const &Path)
 
 size_t WriteEmptyHeader(int fd)
 {
-	char const Text[] = "polytaxis00 00000000512\n\0";
+	char const Text[] = "polytaxis00 0000000512\n\0";
 	write(fd, Text, sizeof(Text) - 1);
-	return 24 + 512;
+	return 22 + 512;
 }
 
 // Filesystem implementation
