@@ -8,10 +8,19 @@
 #include "ren-cxx-filesystem/file.h"
 #include "ren-cxx-fuse/fuse_wrapper.h"
 #include "ren-cxx-fuse/fuse_outofband.h"
-
-#include "common.cxx"
+#include "ren-cxx-filesystem/path.h"
 
 std::string const Mark("<<<<\n");
+
+OptionalT<Filesystem::PathT> GetRoot(void)
+{
+	if (!getenv("HOME"))
+	{
+		std::cerr << "HOME isn't set, can't create mount directory." << std::endl;
+		return {};
+	}
+	return Filesystem::PathT::Absolute(std::string(getenv("HOME")) + "/.local/share/polytaxis-unwrap/mount");
+}
 
 // Signal handling
 std::vector<function<void(void)>> SignalHandlers;
@@ -54,13 +63,20 @@ size_t GetHeaderLength(std::string const &Path)
 	{
 		int Length = 0;
 		{
-			std::vector<uint8_t> Header1(24);
-			File.Read(Header1);
-			if (Header1.size() != 24) throw HeaderReadFail();
-			if (std::string((char const *)&Header1[0], 12) != "polytaxis00 ") throw HeaderReadFail();
-			std::stringstream LengthIn(std::string((char const *)&Header1[13], 11));
-			LengthIn >> Length;
-			if (!LengthIn) throw HeaderReadFail();
+			std::vector<uint8_t> Buffer(12);
+			File.Read(Buffer);
+			if (Buffer.size() != 12) throw HeaderReadFail();
+			if (std::string((char const *)&Buffer[0], 11) != "polytaxis00") throw HeaderReadFail();
+			if (Buffer[11] == 'u') Length = -1;
+			else
+			{
+				Buffer.resize(10);
+				File.Read(Buffer);
+				if (Buffer.size() != 10) throw HeaderReadFail();
+				std::stringstream LengthIn(std::string((char const *)&Buffer[0], 10));
+				LengthIn >> Length;
+				if (!LengthIn) throw HeaderReadFail();
+			}
 		}
 		if (Length < 0)
 		{
@@ -73,7 +89,6 @@ size_t GetHeaderLength(std::string const &Path)
 				auto const FoundAt = Joined.find_first_of(Mark);
 				if (FoundAt == std::string::npos) continue;
 				size_t const FullLength = File.Tell() - Joined.size() + Mark.size();
-				//File.Seek(FullLength);
 				return FullLength;
 
 			}
@@ -82,13 +97,11 @@ size_t GetHeaderLength(std::string const &Path)
 		else
 		{
 			auto FullLength = 24 + Length;
-			//File.Seek(FullLength);
 			return FullLength;
 		}
 	}
 	catch (HeaderReadFail const &Error) 
 	{
-		//File.Seek(0);
 		return 0;
 	}
 }
