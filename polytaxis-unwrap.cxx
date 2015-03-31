@@ -77,6 +77,9 @@ size_t GetHeaderLength(std::string const &Path)
 				LengthIn >> Length;
 				if (!LengthIn) throw HeaderReadFail();
 			}
+			Buffer.resize(1);
+			File.Read(Buffer);
+			if (Buffer.size() != 1) throw HeaderReadFail();
 		}
 		if (Length < 0)
 		{
