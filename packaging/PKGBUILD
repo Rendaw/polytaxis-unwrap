@@ -1,0 +1,36 @@
+pkgname=polytaxis-unwrap
+pkgver=0.0.1
+pkgrel=1
+pkgdesc='A fuse-based polytaxis header skipper.'
+arch=(i686 x86_64)
+url='https://github.com/Rendaw/polytaxis-unwrap'
+license=(BSD)
+depends=(fuse)
+makedepends=(tup)
+source=(
+	git://github.com/Rendaw/polytaxis-unwrap
+	git://github.com/Rendaw/ren-cxx-basics
+	git://github.com/Rendaw/ren-cxx-filesystem
+	git://github.com/Rendaw/ren-cxx-fuse
+)
+sha512sums=(SKIP SKIP SKIP SKIP)
+pkgver() {
+	cd polytaxis-unwrap
+	git describe --tags
+}
+build() {
+	cd polytaxis-unwrap
+	git submodule init
+	git config submodule.ren-cxx-basics.url $srcdir/ren-cxx-basics
+	git config submodule.ren-cxx-filesystem.url $srcdir/ren-cxx-filesystem
+	git config submodule.ren-cxx-fuse.url $srcdir/ren-cxx-fuse
+	git submodule update ren-cxx-basics
+	git submodule update ren-cxx-filesystem
+	git submodule update ren-cxx-fuse
+	./build.sh
+}
+package() {
+	cd polytaxis-unwrap
+	install -d "$pkgdir"/usr/bin
+	install -m755 -t "$pkgdir"/usr/bin polytaxis-unwrap
+}
