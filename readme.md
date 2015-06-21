@@ -26,8 +26,9 @@ Copy `polytaxis-unwrap` to somewhere on your path.
 1. Install homebrew
 2. Run
 ```
-brew tap rendaw/tap
-brew install polytaxis-adventure
+sudo chown -R $USER /usr/local/include
+sudo chown -R $USER /usr/local/lib
+brew install rendaw/tap/polytaxis-adventure
 ```
 
 ### Usage
