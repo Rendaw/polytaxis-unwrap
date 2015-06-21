@@ -26,9 +26,7 @@ Copy `polytaxis-unwrap` to somewhere on your path.
 1. Install homebrew
 2. Run
 ```
-sudo chown -R $USER /usr/local/include
-sudo chown -R $USER /usr/local/lib
-brew install rendaw/tap/polytaxis-unwrap
+sudo chown -R $USER /usr/local/include && sudo chown -R $USER /usr/local/lib && brew install rendaw/tap/polytaxis-unwrap
 ```
 
 ### Usage
